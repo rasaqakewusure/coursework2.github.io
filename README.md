@@ -1,3 +1,4 @@
 # Coursework2
 
-Github pages - https://rasaqakewusure.github.io/Coursework2
+Github pages - https://rasaqakewusure.github.io/coursework2.io
+
