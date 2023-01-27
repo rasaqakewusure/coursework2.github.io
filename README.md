@@ -1,4 +1,4 @@
 # Coursework2
 
-Github pages - https://rasaqakewusure.github.io/coursework2.io
+Github pages - https://coursework2.github.io/fetch-server.js
 
