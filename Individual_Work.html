@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--Title and header-->
+<head>
+    <title>Lessons - Individual Work</title>
+    <style>
+    </style>
+    <link rel="stylesheet" href="Individual_Work.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="https://unpkg.com/vue@2.7.8/dist/vue.js"></script>
+    <script src="subjects.js"></script>
+    </head>
+<!--PRODUCT PAGE-->
+    <body>
+        <div id="app">
+            <header>
+                <u><h1 v-text="sitename"></h1></u>
+                <button class="button1" @click="toggleShowProduct">
+                    {{totalItemsInTheCart}}
+                    <span class="fas fa-shopping-cart"></span>
+                    Checkout
+                </button>
+                <br>
+                <br>
+                <p>Sort:</p>
+                <input type="radio" id="subject" v-model="sortValue" value="subject">
+                <label for="subject">Subject</label><br>
+            </header>
+            <div v-if="showProduct">
+                <main>
+                    <div v-for="subject in sortedProducts">
+                        <h2 v-text="subject.subject"></h2>
+
+                        </p><p v-text="subject.location"></p>
+                        <p>Price: £{{subject.price}}</p>
+                        <img v-bind:src="subject.image">
+                        <br>
+                        <br>
+                        <span v-if="subject.availableInventory === cartCount(subject.id)">All out!</span>
+                        <span v-else-if="subject.availableInventory - cartCount(subject.id) < 5">
+                            Only {{subject.availableInventory - cartCount(subject.id)}} left!
+                        </span>
+                        <span v-else>Buy now!</span>
+                          <button v-on:click="addItemToCart(subject)" v-if="canAddToCart(subject)">Add to cart</button>
+                          <button disabled="disabled" v-else>
+                            Add to cart
+                            </button>
+                            <div>
+                                <span v-for="n in subject.rating" id="star">★</span>
+                                <span v-for="n in 5 - subject.rating" id="star">☆</span>
+                            </div>
+                    </div>
+                    </main>
+            </div>
+            <!--CHECKOUT PAGE-->
+            <div v-else>
+                <h2><u>Shopping Cart</u></h2>
+                <div v-for="subject in sortedProducts" class="shoppingcart">
+                   <span v-if="cartCount(subject.id) > 0">
+                    <p> Subject: {{subject.subject}}</p>
+                    <p> Location: {{subject.location}}</p>
+                    <p> Price: £ {{subject.price}}</p>
+                    <img v-bind:src="subject.image">
+                    <p> Quantity: {{cartCount(subject.id)}}</p>
+                    <button @click="removeCart(subject)" class="button2" v-if="cartCount(subject.id) > 0">Empty Cart</button>
+                     </span>
+                 <span v-else></span>
+                 </div>
+        
+                <h1>Welcome to the Checkout Page</h1>
+                <p>
+                    <strong>Name: </strong>
+                    <input type="name" v-model.trim="order.name" required>
+                </p>
+                <p>
+                    <strong>Phone Number: </strong>
+                    <input type="phone" v-model.number="order.phone" required>
+                </p>
+                <p>
+                    <strong>Surname: </strong>
+                    <input type="surname" v-model.trim="order.surname" required>
+                </p>
+                <p>
+                    <strong>Address:  </strong>
+                    <input type="address" v-model.trim="order.address" required>
+                </p>
+                <p>
+                    <strong>City: </strong>
+                    <input type="city" v-model.trim="order.city" required>
+                </p>
+                <p>
+                    <strong>State: </strong>
+                    <select v-model="order.state">
+                        <option disabled value="" >Select State</option>
+                        <option v-for="(state, key) in states" v-bind:value="state">{{key}}</option>
+                    </select>
+                </p>
+                <p>
+                    <strong>Zip/Postal Code:</strong><input type="number" v-model.number="order.zip" required />
+                </p>
+                <p>
+                    <input type="radio" id="home" value="Home" v-model="order.method">
+                    <label for="home">Home</label>
+                    <input type="radio" id="business" value="Business"
+                    v-model="order.method">
+                    <label for="business">Business</label>
+                </p>
+                
+                <h2><u>Order Summary</u></h2>
+                <p><strong>Name:  </strong>{{order.name}}</p>
+                <p><strong>Phone Number:  </strong>{{order.phone}}</p>
+                <p><strong>Surname:  </strong>{{order.surname}}</p>
+                <p><strong>Address:  </strong>{{order.address}}</p>
+                <p><strong>City:  </strong>{{order.city}}</p>
+                <p><strong>State:  </strong>{{order.state}}</p>
+                <p><strong>Zip/Postal Code:  </strong>{{order.zip}}</p>
+                <p><strong>Method:  </strong>{{order.method}}</p>
+
+                <button v-on:click="submitCheckout">Place Order</button>
+        </div>
+    </div>
+        <script>
+            var webstore = new Vue({
+                el: '#app',
+                data:{
+                    sitename:"Book lessons",
+                    showProduct: true,
+                    subjects : subjects,
+                    sortValue: 'subject',
+                    cart: [],
+                    order:{
+                        name: "",
+                        phone:"",
+                        surname:"",
+                        address:"",
+                        city: "",
+                        state:"",
+                        zip:"",
+                        method:"Home",
+                    },
+                    states: {
+                        AL: "Alabama",
+                        AR: "Arizona",
+                        CA: "California",
+                        NV: "Nevada"
+                    }
+                },
+                methods:{
+                    addItemToCart : function (subject) {
+                        this.cart.push(subject.id);
+                    },
+                    toggleShowProduct(){
+                        this.showProduct = this.showProduct ? false:  true;
+                    },
+                    canAddToCart(subject){
+                        return subject.availableInventory > this.cartCount(subject.id);
+                        
+                    },
+                    submitCheckout(){
+                        alert("Your order has been submitted :)")
+                    },
+                    removeCart(subject){
+                       let i = this.cart.indexOf(subject.id);
+                       if (i > -1){
+                        this.cart.splice(i, 1 );
+                       }
+                       subject.availableInventory + 1;
+                    },
+                    cartCount(id) {
+                        let count = 0;
+                        for(let i = 0; i < this.cart.length; i++) {
+                            if (this.cart[i] === id) {
+                                count++;
+                            }
+                        }
+                        return count;
+                    },
+                    itemsLeft(subject){
+                        return subject.availableInventory - this.cartCount(subject.id);
+                    }
+
+                },
+                computed:  {
+                    totalItemsInTheCart : function  (){
+                        return this.cart.length || "";
+                    },
+                    sortedProducts(){
+                        function compare(a,b){
+                            if (a.price > b.price) return 1;
+                            if (a.price < b.price) return -1;
+                            return -1
+                        }
+                        return this.subjects.sort(compare);
+                    },
+                    sortedLocation : function (){
+                    function compare(a, b) {   
+                    if (a.location < b.location)
+                        return -1;
+                    if (a.location > b.location)
+                        return 1;
+                        return 0;
+                    }
+                    return this.subjects.sort(compare);
+                },
+                sortedName : function (){
+                    function compare(a, b) {   
+                    if (a.subject < b.subject)
+                        return -1;
+                    if (a.subject > b.subject)
+                        return 1;
+                        return 0;
+                    }
+                    return this.subjects.sort(compare);
+                }
+
+
+                }
+                    
+            });
+
+        </script>
+    </body>
+    </html>
